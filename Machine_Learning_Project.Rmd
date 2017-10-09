@@ -1,0 +1,84 @@
+---
+title: "Machine Learning Project"
+author: "Cassie"
+date: "October 9, 2017"
+output: html_document
+---
+
+### This report will look at athletic tech wear data and, using training data, build a model to predict which exercise is being performed based on the other metrics. 
+
+## Set working directory
+```{r, echo = TRUE}
+setwd("~/Coursera/R Repository/Machine Learning")
+```
+
+## Load Packages
+```{r, echo = TRUE}
+library(caret)
+library(kernlab)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(randomForest)
+library(e1071)
+```
+
+## Reading in the training and testing data
+```{r, echo = TRUE}
+testing <- read.csv("pml-testing.csv", na.strings=c("NA", "#DIV/0", ""))
+training <- read.csv("pml-training.csv", na.strings=c("NA", "#DIV/0!", ""))
+```
+
+## Finding columns with NAs
+```{r, echo = TRUE}
+NAs <- colMeans(is.na(training))
+table(NAs)
+```
+
+## Removing columns with NAs
+```{r, echo = TRUE}
+sum(as.logical(NAs))
+colNAs <- !NAs
+sum(colNAs)
+train.NA <- training[colNAs]
+str(train.NA)
+```
+
+## Getting rid of other unecessary columns
+```{r, echo = TRUE}
+others <- grep("^X$|user_name|timestamp|window", names(train.NA))
+train.clean <- train.NA[-others]
+```
+
+## Data partioning for training and testing 
+```{r, echo = TRUE}
+set.seed (1)
+inTrain <- createDataPartition(train.clean$classe, p=0.6, list=FALSE)
+train <- train.clean[inTrain, ]
+test <- train.clean[-inTrain, ]
+```
+
+
+## Testing different prediction models to determine which one has the highest accuracy. 
+
+## 1. Prediction with decision tree
+```{r, echo = TRUE}
+model.1 <- rpart(classe~., data=train, method="class")
+fancyRpartPlot(model.1)
+predict.1 <- predict(model.1, test, type ="class")
+confusionMatrix(predict.1, test$classe)
+```
+
+## 2. Prediction with random forest
+```{r, echo = TRUE}
+model.2 <- randomForest(classe~., data=train, method = "class")
+predict.2 <- predict(model.2, test, type="class")
+confusionMatrix(predict.2, test$classe)
+```
+
+### The random forest model has a higher accuracy rate so we will use that for the prediction model. 
+
+
+
+
