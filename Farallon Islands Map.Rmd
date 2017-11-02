@@ -1,0 +1,18 @@
+---
+title: "Farallon Island Map"
+author: "Cassie"
+date: "November 2, 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo = TRUE}
+library(leaflet)
+library(dplyr)
+my.map <- leaflet() %>% addTiles() %>% addMarkers(lat = 37.698812, lng = -123.004082, popup = "Southeast Farallon Island!") %>% addRectangles(lat1 = 37.799462, lng1 = -123.135483, lat2 = 37.690025, lng2 = -122.993760)
+
+my.map
+```
+
+
